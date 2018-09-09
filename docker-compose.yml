@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+    workspace:
+        build:
+          context: .
+          dockerfile: Dockerfile
+        volumes:
+            - .:/usr/src/app
+        ports:
+            - 3000:3000
+           

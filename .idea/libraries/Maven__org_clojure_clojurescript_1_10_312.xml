@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.clojure:clojurescript:1.10.312">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/clojure/clojurescript/1.10.312/clojurescript-1.10.312.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/clojure/clojurescript/1.10.312/clojurescript-1.10.312-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/clojure/clojurescript/1.10.312/clojurescript-1.10.312-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

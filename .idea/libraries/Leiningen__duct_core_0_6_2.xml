@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: duct/core:0.6.2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/duct/core/0.6.2/core-0.6.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

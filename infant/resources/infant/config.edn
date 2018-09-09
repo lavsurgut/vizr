@@ -1,0 +1,13 @@
+{:duct.core/project-ns  infant
+ :duct.core/environment :production
+
+ :duct.module/logging {}
+ :duct.module.web/api {}
+ 
+ :duct.router/cascading
+ [#ig/ref :infant.handler/queries
+  #ig/ref :infant.handler/files]
+
+
+ :infant.handler/queries {}
+ :infant.handler/files {}}

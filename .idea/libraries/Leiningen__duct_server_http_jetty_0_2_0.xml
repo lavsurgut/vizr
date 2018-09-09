@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: duct/server.http.jetty:0.2.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/duct/server.http.jetty/0.2.0/server.http.jetty-0.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

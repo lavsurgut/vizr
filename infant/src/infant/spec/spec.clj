@@ -1,10 +1,13 @@
 (ns infant.spec.spec
-  (:require [clojure.spec.alpha :as spec]))
+  (:require [clojure.spec.alpha :as spec]
+            [clojure.string :as s]))
 
 
 (spec/def ::not-empty-string (spec/and string?
                                        #(not (= % ""))
                                        #(not (= (s/lower-case %) "null"))))
+
+(spec/def ::? #(= % "?"))
 
 (spec/def ::point #(= % "point"))
 
@@ -16,7 +19,9 @@
 
 (spec/def ::tick #(= % "tick"))
 
-(spec/def ::mark (spec/or :point ::point :bar ::bar :line ::line :area ::area :tick ::tick))
+(spec/def ::mark (spec/or :? ::? :point ::point :bar ::bar :line ::line :area ::area :tick ::tick))
+
+(spec/def ::mark-enum #{::point ::bar ::line ::area ::tick})
 
 (spec/def ::nominal #(= % "nominal"))
 
@@ -40,18 +45,21 @@
 
 (spec/def ::color #(= % "color"))
 
-(spec/def ::channel (spec/or :x ::x :y ::y :row ::row :column ::column :size ::size :color ::color))
+(spec/def ::channel (spec/or :? ::? :x ::x :y ::y :row ::row :column ::column :size ::size :color ::color))
+
+(spec/def ::channel-enum #{::x ::y ::row ::column ::size ::color})
 
 (spec/def ::name ::not-empty-string)
 
 (spec/def ::aggregate boolean?)
+
 ; maps
 ; field
 (spec/def ::field
   (spec/keys :req-un [::name ::channel ::type ::aggregate]))
 
-(spec/def ::fields (s/coll-of ::field :kind vector? :distinct true))
+(spec/def ::fields (spec/coll-of ::field :kind vector? :distinct true))
 
 ; visual specification
 (spec/def ::spec
-  (spec/keys :req-un [::field ::mark]))
+  (spec/keys :req-un [::fields ::mark]))

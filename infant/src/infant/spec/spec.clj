@@ -1,6 +1,7 @@
 (ns infant.spec.spec
   (:require [clojure.spec.alpha :as spec]
-            [clojure.string :as s]))
+            [clojure.string :as s])
+  (:import (clojure.lang MapEntry)))
 
 
 (spec/def ::not-empty-string (spec/and string?
@@ -63,3 +64,46 @@
 ; visual specification
 (spec/def ::spec
   (spec/keys :req-un [::fields ::mark]))
+
+
+(defn make-enum-map
+  [prop]
+  (if (= (val prop)
+         "?")
+    {(key prop) (keyword (str (key prop) "-enum"))}))
+
+
+(defn build-field-enum-list
+  ([field] (build-field-enum-list field {}))
+  ([field res]
+   (if (empty? field)
+     res
+     (let [prop (first field)
+           res (conj res (make-enum-map prop))]
+       (recur (rest field) res)))))
+
+
+(defn build-fields-enum-list
+  ([spec] (build-fields-enum-list (get spec ::fields) []))
+  ([fields res]
+   (if (empty? fields)
+     {::fields res}
+     (let [field (first fields)
+           res (conj res (build-field-enum-list field))]
+       (recur (rest fields) res)))))
+
+
+(defn build-mark-enum-list
+  [spec]
+  (make-enum-map (MapEntry/create ::mark (get spec ::mark))))
+
+
+(defn build-enum-list
+  ;;get spec
+  ;;build a list of possible enumerations
+  ;;
+  [spec]
+  (let [result-spec (build-mark-enum-list spec)
+        result-spec (conj result-spec (build-fields-enum-list spec))]
+    result-spec)
+  )

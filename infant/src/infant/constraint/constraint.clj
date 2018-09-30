@@ -23,4 +23,22 @@
                                         (::sp/ordinal))
                                   (not= (::sp/type field)
                                         (::sp/nominal)))
-                             true))})
+                             true))
+                         ->Constraint
+                         "channel-field-compatible"
+                         "Encoding channel's range type be compatible with channel type."
+                         #{::sp/channel, ::sp/type, ::sp/aggregate}
+                         true
+                         (fn [field]
+                           (sp/is-channel-compatible? field))
+                         ->Constraint
+                         "channel-supports-role"
+                         "Encoding channel should support the role of the field."
+                         #{::sp/channel, ::sp/type, ::sp/aggregate}
+                         true
+                         (fn [field]
+                           (if (= (::sp/channel field) ::?)
+                             true
+                             (sp/support-role? (::sp/channel field) (sp/get-measure-type field))
+                             )
+                           )})

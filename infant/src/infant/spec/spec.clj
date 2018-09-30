@@ -48,6 +48,12 @@
 
 (spec/def ::channel (spec/or :? ::? :x ::x :y ::y :row ::row :column ::column :size ::size :color ::color))
 
+(spec/def ::dimension #(= % "dimension"))
+
+(spec/def ::measure #(= % "measure"))
+
+(spec/def ::measure-type (spec/or :dim ::dimension :mea ::measure))
+
 (spec/def ::channel-enum #{::x ::y ::row ::column ::size ::color})
 
 (spec/def ::name ::not-empty-string)
@@ -99,11 +105,80 @@
 
 
 (defn build-enum-list
-  ;;get spec
-  ;;build a list of possible enumerations
-  ;;
   [spec]
   (let [result-spec (build-mark-enum-list spec)
         result-spec (conj result-spec (build-fields-enum-list spec))]
     result-spec)
   )
+
+(defn is-discrete?
+  [field]
+  (case (::type field)
+    (or ::nominal ::ordinal) true
+    (or ::quantitative ::temporal) (= (::aggregate field) true)
+    false))
+
+(defn is-continuous?
+  [field]
+  (not (is-discrete? field)))
+
+
+(defn is-channel-compatible?
+  [field]
+  (case (::channel field)
+    (or ::row ::column) (if (and (is-continuous? field)
+                                 (::aggregate field))
+                          false
+                          true)
+    (or ::x ::y ::color) true
+    ::size (if (and (is-discrete? field)
+                    (::aggregate field))
+             false
+             true)))
+
+
+(defn get-measure-type
+  [field]
+  (if (or (= (::type field)
+             ::nominal)
+          (= (::type field)
+             ::ordinal)
+          (= (::aggregate field)
+             true))
+    ::dimension
+    ::measure))
+
+
+(defn support-mark?
+  [channel mark]
+  (if (= mark ::?)
+    true
+    (case channel
+      ::? true
+      (or ::x ::y ::color ::row ::column)
+      (case mark
+        (or ::point ::tick ::bar ::line ::area) true
+        false)
+      (::size)
+      (case mark
+        (or ::point ::tick ::bar ::line) true
+        false)
+      false)))
+
+
+(defn support-role?
+  [channel measure-type]
+  (case channel
+    ::? true
+    (or ::x ::y ::color) true
+    (or ::row ::column)
+    (case measure-type
+      ::dimension true
+      ::measure false
+      false)
+    ::size
+    (case measure-type
+      ::dimension false
+      ::measure true
+      false)
+    false))

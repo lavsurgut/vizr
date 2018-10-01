@@ -42,3 +42,15 @@
                              (sp/support-role? (::sp/channel field) (sp/get-measure-type field))
                              )
                            )})
+
+
+(def spec-constraints #{
+                        ->Constraint
+                        "no-repeated-channel"
+                        "Each encoding shall be used only once"
+                        #{::sp/channel}
+                        true
+                        (fn [spec]
+                          (apply distinct?
+                                 (map (fn [f] (::sp/channel f)) (::sp/fields spec))))
+                        })

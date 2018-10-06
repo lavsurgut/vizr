@@ -3,6 +3,11 @@
             [clojure.string :as s])
   (:import (clojure.lang MapEntry)))
 
+(defn in?
+  "true if coll contains elm"
+  [coll elm]
+  (some #(= elm %) coll))
+
 
 (spec/def ::not-empty-string (spec/and string?
                                        #(not (= % ""))
@@ -113,7 +118,7 @@
 
 (defn is-discrete?
   [field]
-  (case (::type field)
+  (condp = (::type field)
     (or ::nominal ::ordinal) true
     (or ::quantitative ::temporal) (= (::aggregate field) true)
     false))
@@ -125,17 +130,24 @@
 
 (defn is-channel-compatible?
   [field]
-  (case (::channel field)
-    (or ::row ::column) (if (and (is-continuous? field)
-                                 (::aggregate field))
-                          false
-                          true)
-    (or ::x ::y ::color) true
-    ::size (if (and (is-discrete? field)
-                    (::aggregate field))
-             false
-             true)))
+  (condp in? (::channel field)
+    [::row ::column] (if (and (is-continuous? field)
+                              (::aggregate field))
+                       false
+                       true)
+    [::x ::y ::color] true
+    [::size] (if (and (is-discrete? field)
+                      (::aggregate field))
+               false
+               true)
+    false))
 
+
+(defn is-aggregate?
+  [spec]
+  (reduce (fn [x y]
+            (or (::aggregate x) (::aggregate y)))
+          (::fields spec)))
 
 (defn get-measure-type
   [field]
@@ -153,32 +165,35 @@
   [channel mark]
   (if (= mark ::?)
     true
-    (case channel
-      ::? true
-      (or ::x ::y ::color ::row ::column)
-      (case mark
-        (or ::point ::tick ::bar ::line ::area) true
+    (condp in? channel
+      [::?] true
+      [::x ::y ::color ::row ::column]
+      (condp in? mark
+        [::point ::tick ::bar ::line ::area]
+        true
         false)
-      (::size)
-      (case mark
-        (or ::point ::tick ::bar ::line) true
+      [::size]
+      (condp in? mark
+        [::point ::tick ::bar ::line]
+        true
         false)
       false)))
 
 
 (defn support-role?
   [channel measure-type]
-  (case channel
-    ::? true
-    (or ::x ::y ::color) true
-    (or ::row ::column)
+  (condp in? channel
+    [::?] true
+    [::x ::y ::color] true
+    [::row ::column]
     (case measure-type
       ::dimension true
       ::measure false
       false)
-    ::size
+    [::size]
     (case measure-type
       ::dimension false
       ::measure true
       false)
-    false))
+    false)
+  )

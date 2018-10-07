@@ -36,7 +36,7 @@
                           #{::sp/channel, ::sp/type, ::sp/aggregate}
                           true
                           (fn [field]
-                            (if (= (::sp/channel field) ::?)
+                            (if (= (::sp/channel field) ::sp/?)
                               true
                               (sp/support-role?
                                 (::sp/channel field) (sp/get-measure-type field))
@@ -76,28 +76,36 @@
                                      (= spec-mark ::sp/area))
                                (sp/is-aggregate? spec)
                                true))
+                           ))
+                       (->Constraint
+                         "omit-non-positional-or-facet-over-positional-channels"
+                         "Don't use non-positional channels unless all positional channels are used."
+                         #{::sp/channel}
+                         false
+                         (fn [spec]
+                           (loop [curr-fields (::sp/fields spec)
+                                 has-enumerated-non-position-or-facet-channel false
+                                 has-x false
+                                 has-y false]
+                             (if (not (empty curr-fields))
+                               (cond
+                                (= (::sp/channel (first curr-fields)) ::sp/x)
+                                (recur (rest curr-fields)
+                                       has-enumerated-non-position-or-facet-channel true has-y)
+                                (= (::sp/channel (first curr-fields)) ::sp/y)
+                                (recur (rest curr-fields)
+                                       has-enumerated-non-position-or-facet-channel has-x true)
+                                (not= (::sp/channel (first curr-fields)) ::sp/?)
+                                (if (sp/is-channel-enumerated? spec)
+                                  (recur (rest curr-fields)
+                                         true has-x has-y)
+                                  (recur (rest curr-fields)
+                                         has-enumerated-non-position-or-facet-channel has-x has-y)))
+                               (if has-enumerated-non-position-or-facet-channel
+                                 (and has-x has-y)
+                                 true))
+                             )
                            ))])
-;Constraint(
-;            name = "omitNonPositionalOrFacetOverPositionalChannels",
-;                 description = "Do not use non-positional channels unless all positional channels are used.",
-;                 properties = Set(Property.CHANNEL),
-;                 allowWildCardForProperties = false,
-;                 strict = false,
-;                 satisfy = (model: WildCardModel) => {
-;                                                      var hasNonPositionalChannelOrFacet, hasEnumeratedNonPositionOrFacetChannel, hasX, hasY = false
-;                                                          model.spec.fields.foreach(f => {
-;                                                                                          if (f.channel == Channel.X) hasX = true
-;                                                                                             else if (f.channel == Channel.Y) hasY = true
-;                                                                                             else if (!WildCard.isWildCard(f.channel.toString)) {
-;                                                                                                                                                 hasNonPositionalChannelOrFacet = true
-;                                                                                                                                                                                if (model.wildCardIdx.contains(Property.CHANNEL)) {
-;                                                                                                                                                                                                                                   hasEnumeratedNonPositionOrFacetChannel = true
-;                                                                                                                                                                                                                                   }
-;                                                                                                                                                 }
-;                                                                                          })
-;                                                          if (hasEnumeratedNonPositionOrFacetChannel) hasX && hasY else true
-;                                                      }
-;                 ),
 ;Constraint(
 ;            name = "omitAggregatePlotWithDimensionOnlyOnFacet",
 ;                 description = "Omit aggregate plots with dimensions only on facets as that leads to inefficient use of space.",

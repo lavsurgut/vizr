@@ -149,6 +149,13 @@
             (or (::aggregate x) (::aggregate y)))
           (::fields spec)))
 
+
+(defn is-channel-enumerated?
+  [spec]
+  (reduce (fn [x y]
+            (or (= (::channel x) ::?) (= (::channel y) ::?)))
+          (::fields spec)))
+
 (defn get-measure-type
   [field]
   (if (or (= (::type field)

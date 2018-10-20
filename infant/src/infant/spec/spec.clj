@@ -27,8 +27,6 @@
 
 (spec/def ::mark (spec/or :? ::? :point ::point :bar ::bar :line ::line :area ::area :tick ::tick))
 
-(spec/def ::mark-enum #{::point ::bar ::line ::area ::tick})
-
 (spec/def ::nominal #(= % "nominal"))
 
 (spec/def ::ordinal #(= % "ordinal"))
@@ -53,13 +51,13 @@
 
 (spec/def ::channel (spec/or :? ::? :x ::x :y ::y :row ::row :column ::column :size ::size :color ::color))
 
+(spec/def ::spatial-channel (spec/or :x ::x :y ::y :row ::row :column ::column))
+
 (spec/def ::dimension #(= % "dimension"))
 
 (spec/def ::measure #(= % "measure"))
 
 (spec/def ::measure-type (spec/or :dim ::dimension :mea ::measure))
-
-(spec/def ::channel-enum #{::x ::y ::row ::column ::size ::color})
 
 (spec/def ::name ::not-empty-string)
 
@@ -204,3 +202,7 @@
       false)
     false)
   )
+
+(defn is-spatial-channel?
+  [spec]
+  (spec/valid? ::spatial-channel spec))

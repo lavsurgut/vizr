@@ -84,28 +84,28 @@
                          false
                          (fn [spec]
                            (loop [curr-fields (::sp/fields spec)
-                                 has-enumerated-non-position-or-facet-channel false
-                                 has-x false
-                                 has-y false
-                                 first-field (first curr-fields)
-                                 rest-fields (rest curr-fields)]
-                             (if (not (empty curr-fields))
-                               (cond
-                                (= (::sp/channel first-field) ::sp/x)
-                                (recur rest-fields
-                                       has-enumerated-non-position-or-facet-channel true has-y)
-                                (= (::sp/channel first-field) ::sp/y)
-                                (recur rest-fields
-                                       has-enumerated-non-position-or-facet-channel has-x true)
-                                (not= (::sp/channel first-field) ::sp/?)
-                                (if (sp/is-channel-enumerated? spec)
-                                  (recur rest-fields
-                                         true has-x has-y)
-                                  (recur rest-fields
-                                         has-enumerated-non-position-or-facet-channel has-x has-y)))
-                               (if has-enumerated-non-position-or-facet-channel
-                                 (and has-x has-y)
-                                 true))
+                                  has-enumerated-non-position-or-facet-channel false
+                                  has-x false
+                                  has-y false]
+                             (let [first-field (first curr-fields)
+                                   rest-fields (rest curr-fields)]
+                               (if (not (empty curr-fields))
+                                 (cond
+                                   (= (::sp/channel first-field) ::sp/x)
+                                   (recur rest-fields
+                                          has-enumerated-non-position-or-facet-channel true has-y)
+                                   (= (::sp/channel first-field) ::sp/y)
+                                   (recur rest-fields
+                                          has-enumerated-non-position-or-facet-channel has-x true)
+                                   (not= (::sp/channel first-field) ::sp/?)
+                                   (if (sp/is-channel-enumerated? spec)
+                                     (recur rest-fields
+                                            true has-x has-y)
+                                     (recur rest-fields
+                                            has-enumerated-non-position-or-facet-channel has-x has-y)))
+                                 (if has-enumerated-non-position-or-facet-channel
+                                   (and has-x has-y)
+                                   true)))
                              )
                            ))
                        (->Constraint
@@ -118,46 +118,44 @@
                              (loop [curr-fields (::sp/fields spec)
                                     has-non-facet-dim false
                                     has-dim false
-                                    has-enumerated-facet-dim false
-                                    first-field (first curr-fields)
-                                    rest-fields (rest curr-fields)]
+                                    has-enumerated-facet-dim false]
+                               (let [first-field (first curr-fields)
+                                     rest-fields (rest curr-fields)]
+                                 (if (not (empty curr-fields))
+                                   (if (not (::sp/aggregate curr-fields))
+                                     (if (and (or (= (::sp/channel first-field) ::sp/row)
+                                                  (= (::sp/channel first-field) ::sp/column))
+                                              (sp/is-channel-enumerated? spec))
+                                       (recur rest-fields has-non-facet-dim true true)
+                                       (recur rest-fields has-non-facet-dim true has-enumerated-facet-dim))
+                                     (recur rest-fields true has-dim has-enumerated-facet-dim))
+                                   (if (and has-dim (not has-non-facet-dim))
+                                     (if (has-enumerated-facet-dim)
+                                       false
+                                       true)
+                                     true))))
+                             true)))
+                       (->Constraint
+                         "omit-multiple-non-positional-channels"
+                         "Unless manually specified, do not use multiple non-positional encoding channel to avoid over-encoding"
+                         #{::sp/channel}
+                         false
+                         (fn [spec]
+                           (loop [curr-fields (::sp/fields spec)
+                                  non-positional-channel-count 0
+                                  has-enumerated-non-positional-channel false
+                                  result true]
+                             (let [first-field (first curr-fields)
+                                   rest-fields (rest curr-fields)]
                                (if (not (empty curr-fields))
-                                 (if (not (::sp/aggregate curr-fields))
-                                  (if (and (or (= (::sp/channel first-field) ::sp/row)
-                                               (= (::sp/channel first-field) ::sp/column))
-                                           (sp/is-channel-enumerated? spec))
-                                    (recur rest-fields has-non-facet-dim true true)
-                                    (recur rest-fields has-non-facet-dim true has-enumerated-facet-dim))
-                                  (recur rest-fields true has-dim has-enumerated-facet-dim))
-                                 (if (and has-dim (not has-non-facet-dim))
-                                   (if (has-enumerated-facet-dim)
-                                     false
-                                     true)
-                                   true)))
-                             true)))])
-;Constraint(
-;            name = "omitMultipleNonPositionalChannels",
-;                 description = "Unless manually specified, do not use multiple non-positional encoding channel to avoid over-encoding.",
-;                 properties = Set(Property.CHANNEL),
-;                 allowWildCardForProperties = true,
-;                 strict = false,
-;                 satisfy = (model: WildCardModel) => {
-;                                                      var nonPositionChannelCount = 0
-;                                                      var hasEnumeratedNonPositionChannel: Boolean = false
-;                                                          model.spec.fields.forall(f => {
-;                                                                                         if (!Field.isValueQuery(f)) {
-;                                                                                                                      if (!WildCard.isWildCard(f.channel.toString)) {
-;                                                                                                                                                                     if (Channel.NONSPATIAL_CHANNELS.contains(f.channel)) {
-;                                                                                                                                                                                                                           nonPositionChannelCount += 1
-;                                                                                                                                                                                                                                                   if (model.wildCardIdx.contains(Property.CHANNEL)) {
-;                                                                                                                                                                                                                                                                                                      hasEnumeratedNonPositionChannel = true
-;                                                                                                                                                                                                                                                                                                      }
-;                                                                                                                                                                                                                           if ((nonPositionChannelCount > 1) && hasEnumeratedNonPositionChannel) {
-;                                                                                                                                                                                                                                                                                                  false
-;                                                                                                                                                                                                                                                                                                  } else true
-;                                                                                                                                                                                                                           } else true
-;                                                                                                                                                                     } else true
-;                                                                                                                      } else true
-;                                                                                         })
-;                                                      }
-;                 )
+                                 (if (not= (::sp/channel first-field) ::sp/?)
+                                   (if (not (sp/is-spatial-channel? (::sp/channel first-field)))
+                                     (if (sp/is-channel-enumerated? spec)
+                                       (if (and (> non-positional-channel-count 1) (has-enumerated-non-positional-channel))
+                                         (recur rest-fields (+ non-positional-channel-count 1) true (and result false))
+                                         (recur rest-fields (+ non-positional-channel-count 1) true (and result true)))
+                                       (recur rest-fields (+ non-positional-channel-count 1) false (and result true)))
+                                     (recur rest-fields non-positional-channel-count false (and result true)))
+                                   (recur rest-fields non-positional-channel-count false (and result true)))
+                                 result
+                                 )))))])

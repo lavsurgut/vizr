@@ -86,61 +86,55 @@
                            (loop [curr-fields (::sp/fields spec)
                                  has-enumerated-non-position-or-facet-channel false
                                  has-x false
-                                 has-y false]
+                                 has-y false
+                                 first-field (first curr-fields)
+                                 rest-fields (rest curr-fields)]
                              (if (not (empty curr-fields))
                                (cond
-                                (= (::sp/channel (first curr-fields)) ::sp/x)
-                                (recur (rest curr-fields)
+                                (= (::sp/channel first-field) ::sp/x)
+                                (recur rest-fields
                                        has-enumerated-non-position-or-facet-channel true has-y)
-                                (= (::sp/channel (first curr-fields)) ::sp/y)
-                                (recur (rest curr-fields)
+                                (= (::sp/channel first-field) ::sp/y)
+                                (recur rest-fields
                                        has-enumerated-non-position-or-facet-channel has-x true)
-                                (not= (::sp/channel (first curr-fields)) ::sp/?)
+                                (not= (::sp/channel first-field) ::sp/?)
                                 (if (sp/is-channel-enumerated? spec)
-                                  (recur (rest curr-fields)
+                                  (recur rest-fields
                                          true has-x has-y)
-                                  (recur (rest curr-fields)
+                                  (recur rest-fields
                                          has-enumerated-non-position-or-facet-channel has-x has-y)))
                                (if has-enumerated-non-position-or-facet-channel
                                  (and has-x has-y)
                                  true))
                              )
-                           ))])
-;Constraint(
-;            name = "omitAggregatePlotWithDimensionOnlyOnFacet",
-;                 description = "Omit aggregate plots with dimensions only on facets as that leads to inefficient use of space.",
-;                 properties = Set(Property.CHANNEL, Property.AGGREGATE, Property.AUTO_COUNT),
-;                 allowWildCardForProperties = false,
-;                 strict = false,
-;                 satisfy = (model: WildCardModel) => {
-;                                                      if (VizRecSpec.isAggregate(model.spec.fields)) {
-;                                                                                                      var hasNonFacetDim_1, hasDim_1, hasEnumeratedFacetDim_1 = false
-;                                                                                                      model.spec.fields.foreach(f => {
-;                                                                                                                                      if (!Field.isValueQuery(f)) {
-;
-;                                                                                                                                                                   if (f.aggregate.isEmpty) {
-;                                                                                                                                                                                             hasDim_1 = true
-;                                                                                                                                                                                                      if (f.channel == Channel.ROW || f.channel == Channel.COLUMN) {
-;                                                                                                                                                                                                                                                                    if (model.wildCardIdx.contains(Property.CHANNEL)) {
-;                                                                                                                                                                                                                                                                                                                       hasEnumeratedFacetDim_1 = true
-;                                                                                                                                                                                                                                                                                                                       }
-;                                                                                                                                                                                                                                                                    }
-;                                                                                                                                                                                             } else {
-;                                                                                                                                                                                                     hasNonFacetDim_1 = true
-;                                                                                                                                                                                                     }
-;
-;                                                                                                                                                                   }
-;
-;                                                                                                                                      })
-;
-;                                                                                                      if (hasDim_1 && !hasNonFacetDim_1) {
-;                                                                                                                                          if (hasEnumeratedFacetDim_1) {
-;                                                                                                                                                                        false
-;                                                                                                                                                                        } else true
-;                                                                                                                                          } else true
-;                                                                                                      } else true
-;                                                      }
-;                 ),
+                           ))
+                       (->Constraint
+                         "omit-aggregate-plot-with-dimension-only-on-facet"
+                         "Omit aggregate plots with dimensions only on facets as that leads to inefficient use of space."
+                         #{::sp/channel ::sp/aggregate}
+                         false
+                         (fn [spec]
+                           (if (sp/is-aggregate? spec)
+                             (loop [curr-fields (::sp/fields spec)
+                                    has-non-facet-dim false
+                                    has-dim false
+                                    has-enumerated-facet-dim false
+                                    first-field (first curr-fields)
+                                    rest-fields (rest curr-fields)]
+                               (if (not (empty curr-fields))
+                                 (if (not (::sp/aggregate curr-fields))
+                                  (if (and (or (= (::sp/channel first-field) ::sp/row)
+                                               (= (::sp/channel first-field) ::sp/column))
+                                           (sp/is-channel-enumerated? spec))
+                                    (recur rest-fields has-non-facet-dim true true)
+                                    (recur rest-fields has-non-facet-dim true has-enumerated-facet-dim))
+                                  (recur rest-fields true has-dim has-enumerated-facet-dim))
+                                 (if (and has-dim (not has-non-facet-dim))
+                                   (if (has-enumerated-facet-dim)
+                                     false
+                                     true)
+                                   true)))
+                             true)))])
 ;Constraint(
 ;            name = "omitMultipleNonPositionalChannels",
 ;                 description = "Unless manually specified, do not use multiple non-positional encoding channel to avoid over-encoding.",

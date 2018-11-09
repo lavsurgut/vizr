@@ -3,11 +3,12 @@
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.9.0"]
+                 [org.clojure/data.json "0.2.6"]
+                 [org.clojure/tools.cli "0.3.7"]
+                 [org.clojure/test.check "0.9.0"]
                  [duct/core "0.6.2"]
                  [duct/module.logging "0.3.1"]
-                 [duct/module.web "0.6.4"]
-                 [org.clojure/data.json "0.2.6"]
-                 [org.clojure/tools.cli "0.3.7"]]
+                 [duct/module.web "0.6.4"]]
   :plugins [[duct/lein-duct "0.10.6"]]
   :main ^:skip-aot infant.main
   :uberjar-name  "infant-standalone.jar"

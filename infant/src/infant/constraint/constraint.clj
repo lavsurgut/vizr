@@ -110,7 +110,8 @@
                            ))
                        (->Constraint
                          "omit-aggregate-plot-with-dimension-only-on-facet"
-                         "Omit aggregate plots with dimensions only on facets as that leads to inefficient use of space."
+                         "Omit aggregate plots with dimensions only on facets
+                         as that leads to inefficient use of space."
                          #{::sp/channel ::sp/aggregate}
                          false
                          (fn [spec]
@@ -137,7 +138,8 @@
                              true)))
                        (->Constraint
                          "omit-multiple-non-positional-channels"
-                         "Unless manually specified, do not use multiple non-positional encoding channel to avoid over-encoding"
+                         "Unless manually specified, do not use multiple non-positional encoding
+                         channel to avoid over-encoding"
                          #{::sp/channel}
                          false
                          (fn [spec]
@@ -151,7 +153,9 @@
                                  (if (not= (::sp/channel first-field) ::sp/?)
                                    (if (not (sp/is-spatial-channel? (::sp/channel first-field)))
                                      (if (sp/is-channel-enumerated? spec)
-                                       (if (and (> non-positional-channel-count 1) (has-enumerated-non-positional-channel))
+                                       (if (and
+                                             (> non-positional-channel-count 1)
+                                             (has-enumerated-non-positional-channel))
                                          (recur rest-fields (+ non-positional-channel-count 1) true (and result false))
                                          (recur rest-fields (+ non-positional-channel-count 1) true (and result true)))
                                        (recur rest-fields (+ non-positional-channel-count 1) false (and result true)))

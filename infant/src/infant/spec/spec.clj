@@ -1,13 +1,24 @@
 (ns infant.spec.spec
   (:require [clojure.spec.alpha :as spec]
-            [clojure.string :as s])
+            [clojure.string :as s]
+            [clojure.spec.gen.alpha :as gen])
   (:import (clojure.lang MapEntry)))
+
+"TODO: add spec for output/input definition"
 
 (defn in?
   "true if coll contains elm"
   [coll elm]
   (some #(= elm %) coll))
 
+
+(def mark? #{::? ::point ::bar ::line ::area ::tick})
+
+(def type? #{::nominal ::ordinal ::quantitative ::temporal})
+
+(def channel? #{::? ::x ::y ::row ::column ::size ::color})
+
+(def spatial-channel? #{::x ::y ::row ::column})
 
 (spec/def ::not-empty-string (spec/and string?
                                        #(not (= % ""))
@@ -25,7 +36,7 @@
 
 (spec/def ::tick #(= % "tick"))
 
-(spec/def ::mark (spec/or :? ::? :point ::point :bar ::bar :line ::line :area ::area :tick ::tick))
+(spec/def ::mark mark?)
 
 (spec/def ::nominal #(= % "nominal"))
 
@@ -35,7 +46,7 @@
 
 (spec/def ::temporal #(= % "temporal"))
 
-(spec/def ::type (spec/or :n ::nominal :o ::ordinal :q ::quantitative :t ::temporal))
+(spec/def ::type type?)
 
 (spec/def ::x #(= % "x"))
 
@@ -49,15 +60,13 @@
 
 (spec/def ::color #(= % "color"))
 
-(spec/def ::channel (spec/or :? ::? :x ::x :y ::y :row ::row :column ::column :size ::size :color ::color))
+(spec/def ::channel channel?)
 
-(spec/def ::spatial-channel (spec/or :x ::x :y ::y :row ::row :column ::column))
+(spec/def ::spatial-channel spatial-channel?)
 
 (spec/def ::dimension #(= % "dimension"))
 
 (spec/def ::measure #(= % "measure"))
-
-(spec/def ::measure-type (spec/or :dim ::dimension :mea ::measure))
 
 (spec/def ::name ::not-empty-string)
 
@@ -78,8 +87,11 @@
 (defn make-enum-map
   [prop]
   (if (= (val prop)
-         "?")
-    {(key prop) (keyword (str (key prop) "-enum"))}))
+         ::?)
+    ; return enumerated spec property and enumeration list from spec property form
+    {(key prop) (filter #(not= % ::?)
+                        (eval (spec/form (key prop))))}
+    prop))
 
 
 (defn build-field-enum-list
@@ -93,7 +105,7 @@
 
 
 (defn build-fields-enum-list
-  ([spec] (build-fields-enum-list (get spec ::fields) []))
+  ([spec] (build-fields-enum-list (::fields spec) []))
   ([fields res]
    (if (empty? fields)
      {::fields res}
@@ -104,10 +116,11 @@
 
 (defn build-mark-enum-list
   [spec]
-  (make-enum-map (MapEntry/create ::mark (get spec ::mark))))
+  (make-enum-map (MapEntry/create ::mark (::mark spec))))
 
 
 (defn build-enum-list
+  "Build enumeration lists for specification properties with '?'"
   [spec]
   (let [result-spec (build-mark-enum-list spec)
         result-spec (conj result-spec (build-fields-enum-list spec))]
@@ -203,6 +216,21 @@
     false)
   )
 
+
 (defn is-spatial-channel?
   [spec]
   (spec/valid? ::spatial-channel spec))
+
+
+(defn build-mark-viz-list
+  [spec]
+  (map (fn [enc] (assoc spec ::mark enc)) (::mark spec)))
+
+;(defn enumerate
+;  "take mark, generate all possible combinations,
+;   filter out wrong ones"
+;  [spec]
+;  (let [result-spec (build-mark-viz-list spec)
+;        result-spec (conj result-spec (build-fields-viz-list spec))]
+;    result-spec)
+;  )

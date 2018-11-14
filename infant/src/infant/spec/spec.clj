@@ -1,8 +1,7 @@
 (ns infant.spec.spec
   (:require [clojure.spec.alpha :as spec]
             [clojure.string :as s]
-            [clojure.spec.gen.alpha :as gen])
-  (:import (clojure.lang MapEntry)))
+            [clojure.set :as set]))
 
 "TODO: add spec for output/input definition"
 
@@ -84,48 +83,32 @@
   (spec/keys :req-un [::fields ::mark]))
 
 
-(defn make-enum-map
-  [prop]
-  (if (= (val prop)
+(defn build-specs
+  [partial-spec props]
+  (if (= (get-in partial-spec props)
          ::?)
-    ; return enumerated spec property and enumeration list from spec property form
-    {(key prop) (filter #(not= % ::?)
-                        (eval (spec/form (key prop))))}
-    prop))
+    (let [enum (eval (spec/form (last props)))
+          filtered-enum (filter #(not= % ::?) enum)]
+      (set (map (fn [enc] (assoc-in partial-spec props enc)) filtered-enum)))
+    #{partial-spec}
+    ))
 
+(defn build-mark-specs
+  [partial-spec]
+  (build-specs partial-spec [::mark]))
 
-(defn build-field-enum-list
-  ([field] (build-field-enum-list field {}))
-  ([field res]
-   (if (empty? field)
-     res
-     (let [prop (first field)
-           res (conj res (make-enum-map prop))]
-       (recur (rest field) res)))))
-
-
-(defn build-fields-enum-list
-  ([spec] (build-fields-enum-list (::fields spec) []))
-  ([fields res]
-   (if (empty? fields)
-     {::fields res}
-     (let [field (first fields)
-           res (conj res (build-field-enum-list field))]
-       (recur (rest fields) res)))))
-
-
-(defn build-mark-enum-list
-  [spec]
-  (make-enum-map (MapEntry/create ::mark (::mark spec))))
-
-
-(defn build-enum-list
-  "Build enumeration lists for specification properties with '?'"
-  [spec]
-  (let [result-spec (build-mark-enum-list spec)
-        result-spec (conj result-spec (build-fields-enum-list spec))]
-    result-spec)
-  )
+(defn build-field-specs
+  [partial-spec specs]
+  (loop [idx 0
+         res specs]
+    (let [size (count (::fields partial-spec))]
+      (if (= idx size)
+       res
+       (->> res
+            (map (fn [spec]
+                   (build-specs spec [::fields idx ::channel])))
+            (reduce (fn [x y] (set/union x y)))
+            (recur (+ idx 1)))))))
 
 (defn is-discrete?
   [field]
@@ -216,21 +199,14 @@
     false)
   )
 
-
 (defn is-spatial-channel?
   [spec]
   (spec/valid? ::spatial-channel spec))
 
 
-(defn build-mark-viz-list
-  [spec]
-  (map (fn [enc] (assoc spec ::mark enc)) (::mark spec)))
-
-;(defn enumerate
-;  "take mark, generate all possible combinations,
-;   filter out wrong ones"
-;  [spec]
-;  (let [result-spec (build-mark-viz-list spec)
-;        result-spec (conj result-spec (build-fields-viz-list spec))]
-;    result-spec)
-;  )
+(defn enumerate
+  "Build possible specifications for specification properties with '?'"
+  [partial-spec]
+  (->> (build-mark-specs partial-spec)
+       (build-field-specs partial-spec))
+  )

@@ -3,13 +3,13 @@
 
 
 (defprotocol Satisfiable
-  (satisfied? [x]))
+  (satisfied? [self y]))
 
 (defrecord Constraint
   [name description properties strict satisfy-fn]
   Satisfiable
-  (satisfied? [x]
-    (satisfy-fn x)))
+  (satisfied? [self y]
+    (satisfy-fn y)))
 
 (def field-constraints [(->Constraint
                           "aggregate-op-supported-by-type"
@@ -89,7 +89,7 @@
                                   has-y false]
                              (let [first-field (first curr-fields)
                                    rest-fields (rest curr-fields)]
-                               (if (not (empty curr-fields))
+                               (if (seq curr-fields)
                                  (cond
                                    (= (::sp/channel first-field) ::sp/x)
                                    (recur rest-fields
@@ -97,12 +97,9 @@
                                    (= (::sp/channel first-field) ::sp/y)
                                    (recur rest-fields
                                           has-enumerated-non-position-or-facet-channel has-x true)
-                                   (not= (::sp/channel first-field) ::sp/?)
-                                   (if (sp/is-channel-enumerated? spec)
-                                     (recur rest-fields
-                                            true has-x has-y)
-                                     (recur rest-fields
-                                            has-enumerated-non-position-or-facet-channel has-x has-y)))
+                                   :else
+                                   (recur rest-fields
+                                          true has-x has-y))
                                  (if has-enumerated-non-position-or-facet-channel
                                    (and has-x has-y)
                                    true)))
@@ -124,14 +121,13 @@
                                      rest-fields (rest curr-fields)]
                                  (if (not (empty curr-fields))
                                    (if (not (::sp/aggregate curr-fields))
-                                     (if (and (or (= (::sp/channel first-field) ::sp/row)
-                                                  (= (::sp/channel first-field) ::sp/column))
-                                              (sp/is-channel-enumerated? spec))
+                                     (if (or (= (::sp/channel first-field) ::sp/row)
+                                             (= (::sp/channel first-field) ::sp/column))
                                        (recur rest-fields has-non-facet-dim true true)
                                        (recur rest-fields has-non-facet-dim true has-enumerated-facet-dim))
                                      (recur rest-fields true has-dim has-enumerated-facet-dim))
                                    (if (and has-dim (not has-non-facet-dim))
-                                     (if (has-enumerated-facet-dim)
+                                     (if has-enumerated-facet-dim
                                        false
                                        true)
                                      true))))
@@ -152,14 +148,34 @@
                                (if (not (empty curr-fields))
                                  (if (not= (::sp/channel first-field) ::sp/?)
                                    (if (not (sp/is-spatial-channel? (::sp/channel first-field)))
-                                     (if (sp/is-channel-enumerated? spec)
-                                       (if (and
-                                             (> non-positional-channel-count 1)
-                                             (has-enumerated-non-positional-channel))
-                                         (recur rest-fields (+ non-positional-channel-count 1) true (and result false))
-                                         (recur rest-fields (+ non-positional-channel-count 1) true (and result true)))
-                                       (recur rest-fields (+ non-positional-channel-count 1) false (and result true)))
+                                     (if (and
+                                           (> non-positional-channel-count 1)
+                                           (has-enumerated-non-positional-channel))
+                                       (recur rest-fields (+ non-positional-channel-count 1) true (and result false))
+                                       (recur rest-fields (+ non-positional-channel-count 1) true (and result true)))
                                      (recur rest-fields non-positional-channel-count false (and result true)))
                                    (recur rest-fields non-positional-channel-count false (and result true)))
                                  result
-                                 )))))])
+                                 )))))
+                       ])
+
+
+(defn field-constraints-satisfied?
+  [fields constraints]
+  (loop [curr-fields fields res true]
+    (if (not (seq curr-fields))
+      res
+      (recur (rest curr-fields)
+        (reduce (fn [x y] (and x (satisfied? y (first curr-fields)))) res constraints)))))
+
+
+(defn spec-constraints-satisfied?
+  [spec constraints]
+  (reduce (fn [x y] (and x (satisfied? y spec))) true constraints))
+
+
+(defn filter-invalid-specs
+  [specs]
+  (->> specs
+       (filter (fn [x] (field-constraints-satisfied? (::sp/fields x) field-constraints)))
+       (filter (fn [x] (spec-constraints-satisfied? x spec-constraints)))))

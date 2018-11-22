@@ -1,4 +1,4 @@
-(ns infant.rank.rank
+(ns infant.rank.axis
   (:require [infant.spec.spec :as sp]))
 
 (def preferred-bin-axis ::sp/x)

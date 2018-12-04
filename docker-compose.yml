@@ -8,5 +8,7 @@ services:
         volumes:
             - .:/usr/src/app
         ports:
-            - 3000:3000
+            - 3449:3449
+            - 7888:7888
+        command: ["/usr/src/app/ui/run.sh"]
            

@@ -23,13 +23,12 @@ RUN chown -R ${CLJ_USER}:${CLJ_GROUP} ${HOME_DIR} ${WORK_DIR}
 
 USER ${CLJ_USER}
 
+RUN mkdir ${WORK_DIR}/ui
 
-WORKDIR ${WORK_DIR}
+WORKDIR ${WORK_DIR}/ui
 
-COPY processor/project.clj ${WORK_DIR}/processor/
+COPY ui/project.clj ${WORK_DIR}/ui/
 
-# RUN cd processor && lein deps
+RUN lein deps
 
-COPY . ${WORK_DIR}
-
-COPY lein/profiles.clj ${HOME_DIR}/.lein/
+# COPY . ${WORK_DIR}

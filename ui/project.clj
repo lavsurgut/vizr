@@ -3,7 +3,8 @@
                  [org.clojure/clojurescript "1.10.238"]
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
-                 [secretary "1.2.3"]]
+                 [secretary "1.2.3"]
+                 [metasoarous/oz "1.3.1"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
 

@@ -2,6 +2,8 @@
   (:require
    [re-frame.core :as re-frame]
    [ui.subs :as subs]
+   [oz.core :as oz]
+   [ui.funcs :as funcs]
    ))
 
 
@@ -14,7 +16,16 @@
 
      [:div
       [:a {:href "#/about"}
-       "go to About Page"]]
+       "go to About Page"]
+      [oz.core/vega-lite {:data {:values (funcs/group-data "munchkin" "witch" "dog" "lion" "tiger" "bear")}
+                          :mark "bar"
+                          :encoding {:x {:field "x"
+                                         :type "ordinal"}
+                                     :y {:aggregate "sum"
+                                         :field "y"
+                                         :type "quantitative"}
+                                     :color {:field "col"
+                                             :type "nominal"}}}]]
      ]))
 
 

@@ -4,7 +4,10 @@
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
                  [secretary "1.2.3"]
-                 [metasoarous/oz "1.3.1"]]
+                 [cljsjs/vega-lite "3.0.0-rc8-0"]
+                 [cljsjs/vega-embed "3.24.1-0"]
+                 [cljsjs/vega-tooltip "0.13.0-0"]
+                 [cljs-ajax "0.7.5"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
 

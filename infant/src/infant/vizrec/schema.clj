@@ -1,4 +1,4 @@
-(ns infant.schema.schema)
+(ns infant.vizrec.schema)
 
 
 (defn find-value-types

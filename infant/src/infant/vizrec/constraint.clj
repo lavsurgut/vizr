@@ -1,4 +1,4 @@
-(ns infant.constraint.constraint
+(ns infant.vizrec.constraint
   (:require [infant.spec.spec :as sp]))
 
 

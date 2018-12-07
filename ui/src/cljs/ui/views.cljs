@@ -2,7 +2,6 @@
   (:require
    [re-frame.core :as re-frame]
    [ui.subs :as subs]
-   [oz.core :as oz]
    [ui.funcs :as funcs]
    ))
 
@@ -12,12 +11,12 @@
 (defn home-panel []
   (let [name (re-frame/subscribe [::subs/name])]
     [:div
-     [:h1 (str "Hello from " @name ". This is the Home Page.")]
+     [:h1 (str "Hello 2 from " @name ". This is the Home Page.")]
 
      [:div
       [:a {:href "#/about"}
        "go to About Page"]
-      [oz.core/vega-lite {:data {:values (funcs/group-data "munchkin" "witch" "dog" "lion" "tiger" "bear")}
+      [funcs/vega-lite {:data {:values (funcs/group-data "munchkin" "witch" "dog" "lion" "tiger" "bear")}
                           :mark "bar"
                           :encoding {:x {:field "x"
                                          :type "ordinal"}

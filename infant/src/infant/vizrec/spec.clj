@@ -1,4 +1,4 @@
-(ns infant.spec.spec
+(ns infant.vizrec.spec
   (:require [clojure.spec.alpha :as spec]
             [clojure.string :as s]
             [clojure.set :as set]))

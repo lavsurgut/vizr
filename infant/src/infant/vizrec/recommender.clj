@@ -1,5 +1,5 @@
 (ns infant.vizrec.recommender
-  (:require [infant.spec.spec :as sp]))
+  (:require [infant.vizrec.spec :as sp]))
 
 (defn recommend
   [spec schema]

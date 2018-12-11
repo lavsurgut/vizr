@@ -11,3 +11,9 @@
  ::active-panel
  (fn [db _]
    (:active-panel db)))
+
+
+(re-frame/reg-sub
+  ::specs
+  (fn [db]
+    (:specs db)))

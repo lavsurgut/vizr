@@ -1,5 +1,5 @@
-(ns infant.rank.axis
-  (:require [infant.spec.spec :as sp]))
+(ns infant.vizrec.rank.axis
+  (:require [infant.vizrec.spec :as sp]))
 
 (def preferred-bin-axis ::sp/x)
 (def preferred-temporal-axis ::sp/x)

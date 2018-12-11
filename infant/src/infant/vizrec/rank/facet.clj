@@ -1,5 +1,5 @@
-(ns infant.rank.facet
-  (:require [infant.spec.spec :as sp]))
+(ns infant.vizrec.rank.facet
+  (:require [infant.vizrec.spec :as sp]))
 
 (def preferred-facet ::sp/row)
 

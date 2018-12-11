@@ -5,9 +5,9 @@
  :duct.module.web/api {}
  
  :duct.router/cascading
- [#ig/ref :infant.handler/queries
-  #ig/ref :infant.handler/files]
+ [#ig/ref :infant.handler/queries]
 
+ :duct.core/handler {:middleware [#ig/ref :infant.middleware.cors/add-cors]}
 
  :infant.handler/queries {}
- :infant.handler/files {}}
+ :infant.middleware.cors/add-cors {}}

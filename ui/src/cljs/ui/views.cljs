@@ -5,27 +5,51 @@
    [ui.funcs :as funcs]
    ))
 
-
 ;; home
+;[:div
+; [:a {:href "#/about"}
+;  "go to About Page"]]
+
+(defn vl-graphs
+  [specs]
+  (reduce conj [:div {:class "columns is-multiline vl-graphs"}]
+          (map (fn [spec] [:div {:class "column"}
+                           [funcs/vega-lite spec]]) specs))
+  )
+
+
+(def dropdown
+  [:div {:class "dropdown is-active"}
+   [:div {:class "dropdown-trigger"}
+    [:button {:class "button is-info"}
+     [:span "Show Top 5"]
+     [:span {:class "icon is-small"}
+      [:i {:class "fas fa-angle-down"}]]]]
+   [:div {:class "dropdown-menu" :role "menu"}
+    [:div {:class "dropdown-content"}
+     [:a {:href "#" :class "dropdown-item is-active"} "Show top 5"]
+     [:a {:href "#" :class "dropdown-item"} "Show top 10"]]]])
+
+
+(def header
+  [:div
+   [:h2 {:class "title has-text-centered"} "Identify outliers"]
+   [:nav {:class "level"}
+    [:div {:class "level-item has-text-centered"}
+     [:div
+      [:div dropdown]]]]])
+
 
 (defn home-panel []
-  (let [name (re-frame/subscribe [::subs/name])]
+  (let [name (re-frame/subscribe [::subs/name])
+        specs (re-frame/subscribe [::subs/specs])]
     [:div
-     [:h1 (str "Hello 2 from " @name ". This is the Home Page.")]
-
-     [:div
-      [:a {:href "#/about"}
-       "go to About Page"]
-      [funcs/vega-lite {:data {:values (funcs/group-data "munchkin" "witch" "dog" "lion" "tiger" "bear")}
-                          :mark "bar"
-                          :encoding {:x {:field "x"
-                                         :type "ordinal"}
-                                     :y {:aggregate "sum"
-                                         :field "y"
-                                         :type "quantitative"}
-                                     :color {:field "col"
-                                             :type "nominal"}}}]]
-     ]))
+     [:div {:class "section"}
+      [:div {:class "container"}
+       header]]
+     [:div {:class "section"}
+      [:div {:class "container"}
+       [vl-graphs @specs]]]]))
 
 
 ;; about
@@ -41,15 +65,13 @@
 
 ;; main
 
-(defn- panels [panel-name]
+(defn panels [panel-name]
   (case panel-name
     :home-panel [home-panel]
     :about-panel [about-panel]
     [:div]))
 
-(defn show-panel [panel-name]
-  [panels panel-name])
 
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [::subs/active-panel])]
-    [show-panel @active-panel]))
+    [panels @active-panel]))

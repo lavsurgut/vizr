@@ -17,25 +17,26 @@
    (assoc db :active-panel active-panel)))
 
 
-(re-frame/reg-event-db        ;; <-- register an event handler
-  :request-it        ;; <-- the event id
+(re-frame/reg-event-db ;; <-- register an event handler
+  ::request-data      ;; <-- the event id
   (fn                ;; <-- the handler function
     [db _]
 
     ;; kick off the GET, making sure to supply a callback for success and failure
     (GET
       "http://localhost:3000/queries"
-      {:handler       #(re-frame/dispatch [:process-response %1])   ;; <2> further dispatch !!
-       :error-handler #(re-frame/dispatch [:bad-response %1])})     ;; <2> further dispatch !!
+      {:handler       #(re-frame/dispatch [::process-response %1])   ;; <2> further dispatch !!
+       ;:error-handler #(re-frame/dispatch [::bad-response %1])
+       })     ;; <2> further dispatch !!
 
     ;; update a flag in `app-db` ... presumably to cause a "Loading..." UI
     (assoc db :loading? true)))    ;; <3> return an updated db
 
 
 (re-frame/reg-event-db
-  :process-response
+  ::process-response
   (fn
     [db [_ response]]           ;; destructure the response from the event vector
     (-> db
         (assoc :loading? false) ;; take away that "Loading ..." UI
-        (assoc :data (js->clj response)))))
+        (assoc :specs (js->clj response)))))

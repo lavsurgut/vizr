@@ -1,5 +1,5 @@
-(ns infant.rank.dimension
-  (:require [infant.spec.spec :as sp]))
+(ns infant.vizrec.rank.dimension
+  (:require [infant.vizrec.spec :as sp]))
 
 (def scores {::sp/row -2
              ::sp/column -2

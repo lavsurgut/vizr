@@ -1,5 +1,5 @@
 (ns infant.vizrec.constraint
-  (:require [infant.spec.spec :as sp]))
+  (:require [infant.vizrec.spec :as sp]))
 
 
 (defprotocol Satisfiable

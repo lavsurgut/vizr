@@ -1,5 +1,5 @@
-(ns infant.rank.mark
-  (:require [infant.spec.spec :as sp]))
+(ns infant.vizrec.rank.mark
+  (:require [infant.vizrec.spec :as sp]))
 
 
 (def measures #{::sp/quantitative ::sp/temporal})
@@ -61,7 +61,7 @@
                     ::sp/point -0.2
                     ::sp/bar -2
                     ::sp/line -2
-                    ::sp/area -2})``````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+                    ::sp/area -2})
 
 
 (def discrete-mark {::sp/point 0
@@ -77,13 +77,13 @@
   (str x "-" y "-" has-occlusion + "-" + mark))
 
 
-(defn init-scores-map
-  [score-map x y has-occlusion repeat-reverse]
-  (reduce
-    (fn [prev next] (let [res (conj prev {(set-name x y has-occlusion (:mark next))})]
-                      (if repeat-reverse
-                        (conj res {(set-name y x has-occlusion (:mark next))})
-                        res))) {} score-map))
+;(defn init-scores-map
+;  [score-map x y has-occlusion repeat-reverse]
+;  (reduce
+;    (fn [prev next] (let [res (conj prev {(set-name x y has-occlusion (:mark next))})]
+;                      (if repeat-reverse
+;                        (conj res {(set-name y x has-occlusion (:mark next))})
+;                        res))) {} score-map))
 
 (defn init-scores
   []

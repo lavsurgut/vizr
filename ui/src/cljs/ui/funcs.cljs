@@ -32,13 +32,15 @@
 
 (defn vega-lite
   "Reagent component that renders vega-lite."
-  [spec]
-  (r/create-class
-    {:display-name "vega-lite"
-     :component-did-mount (fn [this]
-                            (render-vega-lite spec (r/dom-node this)))
-     :component-will-update (fn [this [_ new-spec]]
-                              (render-vega-lite new-spec (r/dom-node this)))
-     :reagent-render (fn [spec]
-                       [:div#vis])}))
+  ([spec]
+    (vega-lite spec "vis"))
+  ([spec id]
+   (r/create-class
+     {:display-name "vega-lite"
+      :component-did-mount (fn [this]
+                             (render-vega-lite spec (r/dom-node this)))
+      :component-will-update (fn [this [_ new-spec]]
+                               (render-vega-lite new-spec (r/dom-node this)))
+      :reagent-render (fn [spec]
+                        [:div {:id id}])})))
 

@@ -14,10 +14,10 @@
 (def field-constraints [(->Constraint
                           "aggregate-op-supported-by-type"
                           "Aggregate function should be supported by data type."
-                          #{::sp/type, ::sp/aggregate}
+                          #{::sp/type, ::sp/aggregate?}
                           true
                           (fn [field]
-                            (if (::sp/aggregate field)
+                            (if (::sp/aggregate? field)
                               (and (not= (::sp/type field)
                                          (::sp/ordinal))
                                    (not= (::sp/type field)
@@ -26,14 +26,14 @@
                         (->Constraint
                           "channel-field-compatible"
                           "Encoding channel's range type be compatible with channel type."
-                          #{::sp/channel, ::sp/type, ::sp/aggregate}
+                          #{::sp/channel, ::sp/type, ::sp/aggregate?}
                           true
                           (fn [field]
                             (sp/is-channel-compatible? field)))
                         (->Constraint
                           "channel-supports-role"
                           "Encoding channel should support the role of the field."
-                          #{::sp/channel, ::sp/type, ::sp/aggregate}
+                          #{::sp/channel, ::sp/type, ::sp/aggregate?}
                           true
                           (fn [field]
                             (if (= (::sp/channel field) ::sp/?)
@@ -67,7 +67,7 @@
                        (->Constraint
                          "omit-bar-line-area-with-occlusion"
                          "Don't use bar, line or area to visualize raw plot as they often lead to occlusion"
-                         #{::sp/aggregate ::sp/mark}
+                         #{::sp/aggregate? ::sp/mark}
                          false
                          (fn [spec]
                            (let [spec-mark (::sp/mark spec)]
@@ -109,7 +109,7 @@
                          "omit-aggregate-plot-with-dimension-only-on-facet"
                          "Omit aggregate plots with dimensions only on facets
                          as that leads to inefficient use of space."
-                         #{::sp/channel ::sp/aggregate}
+                         #{::sp/channel ::sp/aggregate?}
                          false
                          (fn [spec]
                            (if (sp/is-aggregate? spec)
@@ -120,7 +120,7 @@
                                (let [first-field (first curr-fields)
                                      rest-fields (rest curr-fields)]
                                  (if (not (empty curr-fields))
-                                   (if (not (::sp/aggregate curr-fields))
+                                   (if (not (::sp/aggregate? curr-fields))
                                      (if (or (= (::sp/channel first-field) ::sp/row)
                                              (= (::sp/channel first-field) ::sp/column))
                                        (recur rest-fields has-non-facet-dim true true)
@@ -160,7 +160,7 @@
                        ])
 
 
-(defn field-constraints-satisfied?
+(defn- field-constraints-satisfied?
   [fields constraints]
   (loop [curr-fields fields res true]
     (if (not (seq curr-fields))
@@ -169,7 +169,7 @@
         (reduce (fn [x y] (and x (satisfied? y (first curr-fields)))) res constraints)))))
 
 
-(defn spec-constraints-satisfied?
+(defn- spec-constraints-satisfied?
   [spec constraints]
   (reduce (fn [x y] (and x (satisfied? y spec))) true constraints))
 

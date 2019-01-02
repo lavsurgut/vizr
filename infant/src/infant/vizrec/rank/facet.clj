@@ -1,13 +1,12 @@
 (ns infant.vizrec.rank.facet
   (:require [infant.vizrec.spec :as sp]))
 
-(def preferred-facet ::sp/row)
-
-(defn init-scores
+(defn- init-scores
   []
-  (if (= preferred-facet ::sp/row)
-    {::sp/column -0.01}
-    {::sp/row -0.01}))
+  (let [preferred-facet ::sp/row]
+    (if (= preferred-facet ::sp/row)
+     {::sp/column -0.01}
+     {::sp/row -0.01})))
 
 (defn get-score
   [spec]

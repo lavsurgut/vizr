@@ -1,7 +1,7 @@
 (ns infant.datarec.schema)
 
 
-(defn find-value-types
+(defn- find-value-types
   ([data] (find-value-types (first data) {}))
   ([map result]
    (if (empty? map)
@@ -10,7 +10,7 @@
            type (type (first (vals map)))]
        (recur (rest map) (assoc result key type))))))
 
-(defn find-cardinalities
+(defn- find-cardinalities
   ([data]
    (->>
      (map (fn [k] {k (reduce (fn [x y] (conj x (k y))) [] data)} )
@@ -18,7 +18,7 @@
      (map (fn [rec] {(key (first rec)) (count (distinct (val (first rec))))}))
      (reduce (fn [x y] (conj x y))))))
 
-(defn make-schema
+(defn- make-schema
   [types cardinalities]
   (->>
     (map (fn [k] {k {:type (k types) :cardinality (k cardinalities)}})

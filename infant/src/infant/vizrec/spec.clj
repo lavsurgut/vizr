@@ -69,12 +69,12 @@
 
 (spec/def ::name ::not-empty-string)
 
-(spec/def ::aggregate boolean?)
+(spec/def ::aggregate? boolean?)
 
 ; maps
 ; field
 (spec/def ::field
-  (spec/keys :req-un [::name ::channel ::type ::aggregate]))
+  (spec/keys :req-un [::name ::channel ::type ::aggregate?]))
 
 (spec/def ::fields (spec/coll-of ::field :kind vector? :distinct true))
 
@@ -114,7 +114,7 @@
   [field]
   (condp = (::type field)
     (or ::nominal ::ordinal) true
-    (or ::quantitative ::temporal) (= (::aggregate field) true)
+    (or ::quantitative ::temporal) (= (::aggregate? field) true)
     false))
 
 (defn is-continuous?
@@ -126,12 +126,12 @@
   [field]
   (condp in? (::channel field)
     [::row ::column] (if (and (is-continuous? field)
-                              (::aggregate field))
+                              (::aggregate? field))
                        false
                        true)
     [::x ::y ::color] true
     [::size] (if (and (is-discrete? field)
-                      (::aggregate field))
+                      (::aggregate? field))
                false
                true)
     false))
@@ -140,7 +140,7 @@
 (defn is-aggregate?
   [spec]
   (reduce (fn [x y]
-            (or (::aggregate x) (::aggregate y)))
+            (or (::aggregate? x) (::aggregate? y)))
           (::fields spec)))
 
 
@@ -156,7 +156,7 @@
              ::nominal)
           (= (::type field)
              ::ordinal)
-          (= (::aggregate field)
+          (= (::aggregate? field)
              true))
     ::dimension
     ::measure))

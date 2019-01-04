@@ -19,9 +19,9 @@
                           (fn [field]
                             (if (::sp/aggregate? field)
                               (and (not= (::sp/type field)
-                                         (::sp/ordinal))
+                                         ::sp/ordinal)
                                    (not= (::sp/type field)
-                                         (::sp/nominal)))
+                                         ::sp/nominal))
                               true)))
                         (->Constraint
                           "channel-field-compatible"
@@ -178,4 +178,5 @@
   [specs]
   (->> specs
        (filter (fn [x] (field-constraints-satisfied? (::sp/fields x) field-constraints)))
-       (filter (fn [x] (spec-constraints-satisfied? x spec-constraints)))))
+       (filter (fn [x] (spec-constraints-satisfied? x spec-constraints)))
+       ))

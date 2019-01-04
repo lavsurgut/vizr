@@ -1,4 +1,4 @@
-(ns infant.vizrec.rank.mark
+(ns infant.vizrec.rank.effectiveness.mark
   (:require [infant.vizrec.spec :as sp]
             [infant.misc.funcs :as funcs]))
 
@@ -11,14 +11,16 @@
 (defn- init-scores-map
   [score-map x y is-aggregated?]
   (reduce
-    (fn [res [k v]] (conj res {(set-name x y is-aggregated? k) v})) {} score-map))
+    (fn [res [k v]] (do
+                      (conj res {(set-name x y is-aggregated? k) v})
+                      (conj res {(set-name y x is-aggregated? k) v}))) {} score-map))
 
 
 (defn- init-scores
   []
   (let [measure #{::sp/quantitative}
         temporal #{::sp/temporal}
-        discrete #{:sp/nominal ::sp/ordinal}
+        discrete #{::sp/nominal ::sp/ordinal}
         measure-mark {::sp/point 0
                       ::sp/tick  -0.5
                       ::sp/bar   -2
@@ -82,15 +84,15 @@
              (init-scores-map score-map x y is-aggregated)))))
 
 
-(defn get-scores
+(defn measure-rank
   [spec]
   (let [scores (init-scores)
         fields (::sp/fields spec)
-        field-types (reduce (fn [res el]
-                              (cond (= (:sp/channel el) ::sp/x)
-                                    (assoc res ::sp/x (::sp/type))
-                                    (= (:sp/channel el) ::sp/y)
-                                    (assoc res ::sp/y (::sp/type)))) {} fields)
+        field-types (reduce (fn [res el] (condp = (::sp/channel el)
+                                           ::sp/x (assoc res ::sp/x (::sp/type el))
+                                           ::sp/y (assoc res ::sp/y (::sp/type el))))
+                            {}
+                            fields)
         {x ::sp/x
          y ::sp/y} field-types]
     (get scores (set-name x y (sp/is-aggregate? spec) (::sp/mark spec)) 0))

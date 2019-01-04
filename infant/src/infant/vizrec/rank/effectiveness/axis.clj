@@ -1,4 +1,4 @@
-(ns infant.vizrec.rank.axis
+(ns infant.vizrec.rank.effectiveness.axis
   (:require [infant.vizrec.spec :as sp]))
 
 
@@ -15,10 +15,10 @@
         preferred-axes   {::sp/temporal preferred-temporal-axis
                           ::sp/ordinal preferred-ordinal-axis
                           ::sp/nominal preferred-nominal-axis}]
-    (reduce (fn [x [k v]] (conj x {(set-name k v) -0.01})) {} preferred-axes)))
+    (reduce (fn [x [k v]] (conj x {(set-name k v) 0.01})) {} preferred-axes)))
 
 
-(defn get-score
+(defn measure-rank
   [spec]
   (let [scores (init-scores)
         fields (::sp/fields spec)]

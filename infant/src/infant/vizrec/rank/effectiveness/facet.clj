@@ -1,4 +1,4 @@
-(ns infant.vizrec.rank.facet
+(ns infant.vizrec.rank.effectiveness.facet
   (:require [infant.vizrec.spec :as sp]))
 
 (defn- init-scores
@@ -8,7 +8,7 @@
      {::sp/column -0.01}
      {::sp/row -0.01})))
 
-(defn get-score
+(defn measure-rank
   [spec]
   (let [scores (init-scores)
         fields (::sp/fields spec)]

@@ -3,7 +3,6 @@
             [clojure.string :as s]
             [clojure.set :as set]))
 
-"TODO: add spec for output/input definition"
 
 (defn in?
   "true if coll contains elm"
@@ -141,7 +140,8 @@
   [spec]
   (reduce (fn [x y]
             (or (::aggregate? x) (::aggregate? y)))
-          (::fields spec)))
+          (::fields spec))
+  )
 
 
 (defn is-channel-enumerated?

@@ -1,4 +1,4 @@
-(ns infant.vizrec.rank.size-channel)
+(ns infant.vizrec.rank.effectiveness.size-channel)
 
 
 (defn- set-name
@@ -6,7 +6,7 @@
   (str mark "-" channel))
 
 
-(defn get-score
+(defn measure-rank
   [spec]
   (let [fields (::sp/fields spec)
         mark (::sp/mark spec)

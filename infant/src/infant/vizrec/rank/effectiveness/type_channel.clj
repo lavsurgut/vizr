@@ -1,4 +1,4 @@
-(ns infant.vizrec.rank.type-channel
+(ns infant.vizrec.rank.effectiveness.type-channel
   (:require [infant.vizrec.spec :as sp]))
 
 
@@ -44,7 +44,7 @@
                    (init-scores-map score-map type is-aggregated?)))))
 
 
-(defn get-score
+(defn measure-rank
   [spec]
   (let [scores (init-scores)
         fields (::sp/fields spec)]

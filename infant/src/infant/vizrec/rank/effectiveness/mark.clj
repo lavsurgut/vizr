@@ -11,9 +11,9 @@
 (defn- init-scores-map
   [score-map x y is-aggregated?]
   (reduce
-    (fn [res [k v]] (do
-                      (conj res {(set-name x y is-aggregated? k) v})
-                      (conj res {(set-name y x is-aggregated? k) v}))) {} score-map))
+    (fn [res [k v]] (conj res
+                          {(set-name x y is-aggregated? k) v}
+                          {(set-name y x is-aggregated? k) v})) {} score-map))
 
 
 (defn- init-scores
@@ -78,10 +78,10 @@
                    [discrete discrete [[discrete-mark true]
                                        [discrete-mark false]]]]]
     (reduce conj
-           (for [[marks-1 marks-2 score-occlusion-maps] mark-maps
-                 [x y] (into [] (funcs/cartesian-join (list marks-1 marks-2)))
-                 [score-map is-aggregated] score-occlusion-maps]
-             (init-scores-map score-map x y is-aggregated)))))
+            (for [[marks-1 marks-2 score-occlusion-maps] mark-maps
+                  [x y] (into [] (funcs/cartesian-join (list marks-1 marks-2)))
+                  [score-map is-aggregated] score-occlusion-maps]
+              (init-scores-map score-map x y is-aggregated)))))
 
 
 (defn measure-rank

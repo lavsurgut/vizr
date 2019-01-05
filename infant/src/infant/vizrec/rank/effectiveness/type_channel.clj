@@ -49,5 +49,6 @@
   (let [scores (init-scores)
         fields (::sp/fields spec)]
     (reduce (fn [x y]
-              (+ x (get scores (set-name (::sp/type y) (::sp/channel y) (::sp/aggregate? y)) 0)))
+              (+ x (get scores
+                        (set-name (::sp/type y) (::sp/channel y) (::sp/aggregate? y)) 0)))
             0 fields)))

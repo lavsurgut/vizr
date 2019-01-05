@@ -9,13 +9,13 @@
 
 (defn- init-scores
   []
-  (let [preferred-temporal-axis ::sp/x
-        preferred-ordinal-axis ::sp/y
-        preferred-nominal-axis ::sp/y
-        preferred-axes   {::sp/temporal preferred-temporal-axis
-                          ::sp/ordinal preferred-ordinal-axis
-                          ::sp/nominal preferred-nominal-axis}]
-    (reduce (fn [x [k v]] (conj x {(set-name k v) 0.01})) {} preferred-axes)))
+  (let [unpreferred-temporal-axis ::sp/y
+        unpreferred-ordinal-axis ::sp/x
+        unpreferred-nominal-axis ::sp/x
+        unpreferred-axes   {::sp/temporal unpreferred-temporal-axis
+                          ::sp/ordinal unpreferred-ordinal-axis
+                          ::sp/nominal unpreferred-nominal-axis}]
+    (reduce (fn [x [k v]] (conj x {(set-name k v) -0.01})) {} unpreferred-axes)))
 
 
 (defn measure-rank

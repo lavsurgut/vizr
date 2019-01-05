@@ -1,4 +1,5 @@
-(ns infant.vizrec.rank.effectiveness.size-channel)
+(ns infant.vizrec.rank.effectiveness.size-channel
+  (:require [infant.vizrec.spec :as sp]))
 
 
 (defn- set-name

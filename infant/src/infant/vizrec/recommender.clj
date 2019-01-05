@@ -5,9 +5,8 @@
 
 
 (defn recommend
-  [spec]
-  (->> spec
+  [partial-spec]
+  (->> partial-spec
        (sp/enumerate)
        (constraint/filter-invalid-specs)
-       ;; rank them
-       ))
+       (eff/rank)))

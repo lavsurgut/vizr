@@ -9,4 +9,7 @@
   (->> partial-spec
        (sp/enumerate)
        (constraint/filter-invalid-specs)
-       (eff/rank)))
+       (eff/rank)
+       (sort-by val >)
+       (first)
+       (key)))

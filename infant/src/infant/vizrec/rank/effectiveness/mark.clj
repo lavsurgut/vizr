@@ -21,6 +21,7 @@
   (let [measure #{::sp/quantitative}
         temporal #{::sp/temporal}
         discrete #{::sp/nominal ::sp/ordinal}
+        none #{::none}
         measure-mark {::sp/point 0
                       ::sp/tick  -0.5
                       ::sp/bar   -2
@@ -66,15 +67,17 @@
                        ::sp/bar   -2
                        ::sp/line  -2
                        ::sp/area  -2}
-        mark-maps [[measure measure [[measure-mark false]]]
-                   [measure measure [[agg-measure-mark true]]]
-                   [measure temporal [[measure-temporal-mark false]]]
-                   [measure temporal [[agg-measure-temporal-mark true]]]
-                   [measure discrete [[measure-discrete-mark false]]]
-                   [measure discrete [[agg-measure-discrete-mark true]]]
-                   [temporal temporal [[temporal-mark false]]]
-                   [temporal temporal [[agg-measure-mark true]]]
+        mark-maps [[measure measure [[measure-mark false]
+                                     [agg-measure-mark true]]]
+                   [measure temporal [[measure-temporal-mark false]
+                                      [agg-measure-temporal-mark true]]]
+                   [measure discrete [[measure-discrete-mark false]
+                                      [agg-measure-discrete-mark true]]]
+                   [measure none [[measure-discrete-mark false]]]
+                   [temporal temporal [[temporal-mark false]
+                                       [agg-measure-mark true]]]
                    [temporal discrete [[temporal-discrete-mark false]]]
+                   [temporal none [[temporal-discrete-mark false]]]
                    [discrete discrete [[discrete-mark true]
                                        [discrete-mark false]]]]]
     (reduce conj
@@ -93,7 +96,7 @@
                                            ::sp/y (assoc res ::sp/y (::sp/type el))))
                             {}
                             fields)
-        {x ::sp/x
-         y ::sp/y} field-types]
+        x (get field-types ::sp/x ::none)
+        y (get field-types ::sp/y ::none)]
     (get scores (set-name x y (sp/is-aggregate? spec) (::sp/mark spec)) 0))
   )

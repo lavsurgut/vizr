@@ -140,6 +140,7 @@
   [spec]
   (reduce (fn [x y]
             (or (::aggregate? x) (::aggregate? y)))
+          false
           (::fields spec))
   )
 

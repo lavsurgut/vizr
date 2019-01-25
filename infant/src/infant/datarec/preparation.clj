@@ -21,7 +21,7 @@
               (assoc coll k (k data-by-key))) {})))
 
 
-(defn get-frequences
+(defn get-frequencies
   [data-by-key]
   (map (fn [k] {k (frequencies (k data-by-key))})
        (keys data-by-key)))
@@ -45,10 +45,21 @@
     outliers-by-key))
 
 
+(defn get-euclidean-distance-from-mean
+  [data-by-key]
+  (map (fn [[k arr]]
+         {k (let [mn (mean arr)]
+              (for [el arr]
+                (euclidean-distance [mn 0] [el 0])))}) data-by-key))
+
+
 (defn prepare-data
   [data]
   (let [data-by-key (get-data-by-key data)
         schema (schema/get-schema data)
         numeric-data-by-key (get-numeric-data data-by-key schema)
-        outliers (into {} (get-outliers numeric-data-by-key))]
-    (->> (assoc {} :outliers outliers))))
+        outliers (into {} (get-outliers numeric-data-by-key))
+        euclidean-distance-from-mean (into {} (get-euclidean-distance-from-mean numeric-data-by-key))
+        res (assoc {} :outliers outliers)
+        res (assoc res :euclidean-distance-from-mean euclidean-distance-from-mean)]
+    res))

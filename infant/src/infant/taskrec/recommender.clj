@@ -30,7 +30,7 @@
                                              ::sp/y {:y {:field "" :type (name (::sp/type el))}})))
                                    {}
                                    (::sp/fields vizrec-result-spec))
-        vega-lite-spec {:data {:values data}
+        vega-lite-spec {:data     {:values data}
                         :mark     (name (::sp/mark vizrec-result-spec))
                         :encoding vega-lite-encoding}
         result (reduce (fn [res [k _]]

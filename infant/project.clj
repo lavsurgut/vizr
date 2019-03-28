@@ -6,6 +6,7 @@
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/tools.cli "0.3.7"]
                  [org.clojure/test.check "0.9.0"]
+                 [org.clojure/algo.generic "0.1.3"]
                  [duct/core "0.6.2"]
                  [duct/module.logging "0.3.1"]
                  [duct/module.web "0.6.4"]

@@ -1,0 +1,3 @@
+19-01-22 09:51:52 vlavr-ESPRIMO-P757 REPORT [duct.server.http.jetty:13] - :duct.server.http.jetty/starting-server {:port 3000}
+19-01-22 09:52:23 vlavr-ESPRIMO-P757 INFO [duct.middleware.web:16] - :duct.middleware.web/request {:request-method :get, :uri "/queries", :query-string nil}
+19-01-22 09:52:24 vlavr-ESPRIMO-P757 INFO [duct.middleware.web:16] - :duct.middleware.web/request {:request-method :get, :uri "/favicon.ico", :query-string nil}
